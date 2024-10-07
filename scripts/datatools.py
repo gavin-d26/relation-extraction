@@ -3,13 +3,27 @@ import torch
 import spacy
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
+import spacy
+import spacy_cleaner
+from spacy_cleaner.processing import removers, replacers, mutators, transformers
 
 torch.manual_seed(0)
 
 
 # converts .csv file to train and val Dataframes. Also indexes the classes
 def preprocess_raw_training_file(hw_csv_file):
+    
+    model = spacy.load("en_core_web_sm")
+    pipeline = spacy_cleaner.Cleaner(
+    model,
+    removers.remove_number_token,
+    removers.remove_stopword_token,
+    removers.remove_punctuation_token,
+    mutators.mutate_lemma_token    
+    )
+    
     df = pd.read_csv(hw_csv_file)
+    df["UTTERANCES"]=pipeline.clean(df["UTTERANCES"])
     df["CORE RELATIONS"] = df["CORE RELATIONS"].str.split(" ")
     edf = df.explode('CORE RELATIONS')
     edf["values"]=str(1)
