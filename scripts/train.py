@@ -1,3 +1,4 @@
+import os
 from tqdm import tqdm
 import torch
 import torch.nn.functional as F
@@ -31,10 +32,10 @@ class MultilabelAccuracy():
         return result
 
 
-def balanced_loss_fn(preds, targets):
+def balanced_loss_fn(preds, targets, damping_factor):
     num_targets = targets.sum(dim=0)
     discard_classes=num_targets!=0
-    positive_score = len(targets)/(num_targets+1e-7)
+    positive_score = len(targets)/(num_targets*damping_factor+1e-7)
     loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=positive_score).mean(dim=0)
     loss=loss_classwise[discard_classes].mean()
     return loss
@@ -49,19 +50,24 @@ def train_func(
     run_name="base-0_1",
     lr=3e-4,
     optimizer='adam',
-    device='cpu'
+    device='cpu',
+    damping_factor=2,
                ):
     device = torch.device(device)
     model.to(device=device)
-    
+
     loss_fn = torch.nn.BCEWithLogitsLoss()
     
     if optimizer=='adam':
         optimizer=torch.optim.Adam(model.parameters(), lr=lr)
+        
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs*len(train_loader))
     
     train_acc = MultilabelAccuracy()
     val_acc = MultilabelAccuracy()
     val_acc_classwise = MultilabelAccuracy(classwise=True)
+    
+    max_val_acc=0
     
     print(f"Starting Training: {run_name}")
     
@@ -77,13 +83,14 @@ def train_func(
             inputs, targets = inputs.to(device), targets.to(device)
             
             preds = model(inputs)
-            loss = balanced_loss_fn(preds, targets)
+            loss = balanced_loss_fn(preds, targets, damping_factor)
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
             
             train_acc.update(preds.detach(), targets)
             train_loss.append(loss.detach().cpu())
+            # scheduler.step()
         
         
         # evaluate on val set
@@ -107,9 +114,17 @@ def train_func(
             "val_acc_classwise":val_acc_classwise.compute(),
         }
         
+        if metrics["val_acc"]>max_val_acc:
+            if not os.path.isdir("./checkpoints"):
+                os.mkdir("./checkpoints")
+            torch.save(model.state_dict(), "./checkpoints/model.pt")
+            max_val_acc=metrics["val_acc"]
+        
         print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.2f} \
                 val_acc": {metrics["val_acc"]:.2f}')
         
+    model.to(device=torch.device('cpu'))
+    model.load_state_dict(torch.load("./checkpoints/model.pt", map_location="cpu"))
         
         
         

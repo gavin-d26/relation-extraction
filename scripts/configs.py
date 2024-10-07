@@ -1,6 +1,9 @@
 run_name="baseline-0_1"
 lr = 3e-4
-batch_size=64
-device= 'cpu' #'cpu'
-epochs=200
+batch_size=256
+device= 'cuda' #'cpu'
+epochs=600
 optimizer='adam'
+lr_patience=80
+dropout=0.2
+damping_factor=2

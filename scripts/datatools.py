@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 import spacy
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 import spacy
 import spacy_cleaner
@@ -16,14 +16,12 @@ def preprocess_raw_training_file(hw_csv_file):
     model = spacy.load("en_core_web_sm")
     pipeline = spacy_cleaner.Cleaner(
     model,
-    removers.remove_number_token,
-    removers.remove_stopword_token,
-    removers.remove_punctuation_token,
-    mutators.mutate_lemma_token    
+    removers.remove_number_token
     )
     
     df = pd.read_csv(hw_csv_file)
-    df["UTTERANCES"]=pipeline.clean(df["UTTERANCES"])
+    df["UTTERANCES"]=pipeline.clean(df["UTTERANCES"].str.strip())
+    df["UTTERANCES"]=df["UTTERANCES"].apply(lambda x: ''.join((item for item in x if not item.isdigit())))
     df["CORE RELATIONS"] = df["CORE RELATIONS"].str.split(" ")
     edf = df.explode('CORE RELATIONS')
     edf["values"]=str(1)
@@ -49,7 +47,7 @@ def preprocess_raw_training_file(hw_csv_file):
 # fit a count vectorizer on text corpus
 def make_vectorizer(hw_csv_file):
     df = pd.read_csv(hw_csv_file)
-    vectorizer = CountVectorizer(stop_words='english', max_features=1500)
+    vectorizer = TfidfVectorizer(stop_words='english', max_features=1500)
     vectorizer.fit(df['UTTERANCES'].values)
     return vectorizer
 

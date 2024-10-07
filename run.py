@@ -29,7 +29,7 @@ def main():
     train_loader, val_loader = datatools.create_dataloaders(train_df, val_df, vectorizer, configs.batch_size)
     
     # initialize model
-    model = models.RelationClassifier(len(vectorizer.vocabulary_))
+    model = models.RelationClassifierPro(len(vectorizer.vocabulary_), dropout=configs.dropout)
     
     train.train_func(
         model,
@@ -39,7 +39,8 @@ def main():
         run_name=configs.run_name,
         lr=configs.lr,
         optimizer=configs.optimizer,
-        device=configs.device
+        device=configs.device,
+        damping_factor=configs.damping_factor
     )
     
     predict.make_submission_file(model,
