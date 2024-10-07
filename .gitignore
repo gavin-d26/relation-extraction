@@ -1,0 +1,6 @@
+.vscode
+*.csv
+!data/hw1_test.csv
+!data/hw1_train.csv
+*__pycache__*
+.DS_Store
