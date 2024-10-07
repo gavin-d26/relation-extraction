@@ -40,7 +40,8 @@ def main():
         lr=configs.lr,
         optimizer=configs.optimizer,
         device=configs.device,
-        damping_factor=configs.damping_factor
+        damping_factor=configs.damping_factor,
+        weight_decay=configs.weight_decay
     )
     
     predict.make_submission_file(model,

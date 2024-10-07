@@ -52,6 +52,7 @@ def train_func(
     optimizer='adam',
     device='cpu',
     damping_factor=2,
+    weight_decay=1e-5
                ):
     device = torch.device(device)
     model.to(device=device)
@@ -59,7 +60,7 @@ def train_func(
     loss_fn = torch.nn.BCEWithLogitsLoss()
     
     if optimizer=='adam':
-        optimizer=torch.optim.Adam(model.parameters(), lr=lr)
+        optimizer=torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
         
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs*len(train_loader))
     
