@@ -52,6 +52,14 @@ def main():
                                  device=configs.device)
     
     
+    predict.make_validation_file(model,
+                                 vectorizer,
+                                 val_df, 
+                                 ID_TO_NAME, 
+                                 threshold=0., 
+                                 device=configs.device)
+    
+    
 if __name__=="__main__":
     main()
     

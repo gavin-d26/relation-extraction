@@ -36,6 +36,8 @@ def preprocess_raw_training_file(hw_csv_file):
        'movie.rating', 'movie.starring.actor', 'movie.starring.character',
        'movie.subjects', 'none', 'person.date_of_birth']]
     
+    pdf=pdf.drop(columns=['none'])
+    
     ID_TO_NAME = {k:v for k,v in enumerate(pdf.columns[1:])}
     X, Y = pdf.iloc[:, 0:1], pdf.iloc[:, 1:]
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.10, random_state=0)

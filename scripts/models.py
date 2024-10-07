@@ -7,7 +7,7 @@ class RelationClassifier(nn.Module):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, 256)
         self.fc2 = nn.Linear(256, 64)
-        self.fc3 = nn.Linear(64, 19)
+        self.fc3 = nn.Linear(64, 18)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.1)
     
@@ -41,7 +41,7 @@ class RelationClassifierPro(nn.Module):
                                     Block(256, 64, dropout=dropout),
                                     Block(64, 64, dropout=dropout),
                                     Block(64, 64, dropout=dropout),
-                                    nn.Linear(64, 19)
+                                    nn.Linear(64, 18)
                                     )
     
     def forward(self, inputs):  # x (batch_size, input_dim)
