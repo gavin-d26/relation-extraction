@@ -4,3 +4,4 @@
 !data/hw1_train.csv
 *__pycache__*
 .DS_Store
+*.txt
