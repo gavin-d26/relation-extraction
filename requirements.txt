@@ -2,4 +2,3 @@ pandas
 numpy
 spacy
 torch
-spacy-cleaner
