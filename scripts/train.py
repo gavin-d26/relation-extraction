@@ -32,13 +32,16 @@ class MultilabelAccuracy():
         return result
 
 
-def balanced_loss_fn(preds, targets, damping_factor):
+def balanced_loss_fn(preds, targets, damping_factor, classwise_weights=None):
     num_targets = targets.sum(dim=0)
     discard_classes=num_targets!=0
-    positive_score = len(targets)/(num_targets*damping_factor+1e-7)
+    positive_score = len(targets)/(num_targets+1e-6)
+    if classwise_weights:
+        positive_score*classwise_weights
     loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=positive_score).mean(dim=0)
     loss=loss_classwise[discard_classes].mean()
-    return loss
+    zeros_loss = loss_classwise[~discard_classes].mean()*damping_factor
+    return loss+zeros_loss
     
 
 # function to train the pytorch model        
@@ -52,10 +55,14 @@ def train_func(
     optimizer='adam',
     device='cpu',
     damping_factor=2,
-    weight_decay=1e-5
+    weight_decay=1e-5,
+    classwise_weights=None
                ):
     device = torch.device(device)
     model.to(device=device)
+    
+    if classwise_weights:
+        classwise_weights=torch.tensor(classwise_weights, device=device)
 
     loss_fn = torch.nn.BCEWithLogitsLoss()
     
@@ -84,14 +91,14 @@ def train_func(
             inputs, targets = inputs.to(device), targets.to(device)
             
             preds = model(inputs)
-            loss = balanced_loss_fn(preds, targets, damping_factor)
+            loss = balanced_loss_fn(preds, targets, damping_factor, classwise_weights=classwise_weights)
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
             
             train_acc.update(preds.detach(), targets)
             train_loss.append(loss.detach().cpu())
-            # scheduler.step()
+            scheduler.step()
         
         
         # evaluate on val set

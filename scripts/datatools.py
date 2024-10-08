@@ -4,24 +4,30 @@ import spacy
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 import spacy
-import spacy_cleaner
-from spacy_cleaner.processing import removers, replacers, mutators, transformers
 
 torch.manual_seed(0)
 
 
+# func to clean text sentences
+def clean_utterance_text(series):
+    
+    nlp=spacy.load("en_core_web_sm")
+    series=series.str.strip()
+    series=series.str.lower()
+    series=series.apply(lambda x: ''.join((item for item in x if not item.isdigit())))
+    series=pd.Series(list(nlp.pipe(series.tolist())))
+    series=series.apply(lambda doc: [word.lemma_ for word in doc if not word.is_stop])
+    series=series.apply(lambda doc: " ".join(doc))
+    return series
+
+
 # converts .csv file to train and val Dataframes. Also indexes the classes
 def preprocess_raw_training_file(hw_csv_file):
-    
-    model = spacy.load("en_core_web_sm")
-    pipeline = spacy_cleaner.Cleaner(
-    model,
-    removers.remove_number_token
-    )
-    
     df = pd.read_csv(hw_csv_file)
-    df["UTTERANCES"]=pipeline.clean(df["UTTERANCES"].str.strip())
-    df["UTTERANCES"]=df["UTTERANCES"].apply(lambda x: ''.join((item for item in x if not item.isdigit())))
+    
+    # clean training sentences
+    df["UTTERANCES"]=clean_utterance_text(df["UTTERANCES"])
+    
     df["CORE RELATIONS"] = df["CORE RELATIONS"].str.split(" ")
     edf = df.explode('CORE RELATIONS')
     edf["values"]=str(1)
@@ -55,7 +61,9 @@ def make_vectorizer(hw_csv_file):
 
 
 # used to convert raw utterances to tensors for input to model (can be (B, embed_dim) or (B, S, embed_dim)!!)
-def utterances_to_tensors(utterance_series, vectorizer):
+def utterances_to_tensors(utterance_series, vectorizer, embeddings=True):
+    if embeddings:
+        pass
     return torch.FloatTensor(vectorizer.transform(utterance_series.values).toarray())
 
 

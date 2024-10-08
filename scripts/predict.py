@@ -40,6 +40,10 @@ def make_validation_file(model, vectorizer, val_df, ids_to_names, save_validatio
     device=torch.device(device)
     model.to(device)
     
+    # clean sentences
+    val_df['UTTERANCES']=clean_utterance_text(val_df['UTTERANCES'])
+    
+    # convert sentences to tensors
     inputs = utterances_to_tensors(val_df['UTTERANCES'], vectorizer)
     
     model.eval()
