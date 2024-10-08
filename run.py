@@ -29,7 +29,7 @@ def main():
     train_loader, val_loader = datatools.create_dataloaders(train_df, val_df, vectorizer, configs.batch_size)
     
     # initialize model
-    model = models.RelationClassifierPro(len(vectorizer.vocabulary_), dropout=configs.dropout)
+    model = models.RelationClassifierPro(train_loader.dataset[0][0].shape[0], dropout=configs.dropout)
     
     train.train_func(
         model,

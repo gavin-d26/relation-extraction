@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import torch
 import spacy
@@ -7,16 +8,16 @@ import spacy
 
 torch.manual_seed(0)
 
+spacy.cli.download("en_core_web_md")
+nlp=spacy.load("en_core_web_sm")
 
 # func to clean text sentences
 def clean_utterance_text(series):
-    
-    nlp=spacy.load("en_core_web_sm")
     series=series.str.strip()
     series=series.str.lower()
     series=series.apply(lambda x: ''.join((item for item in x if not item.isdigit())))
     series=pd.Series(list(nlp.pipe(series.tolist())))
-    series=series.apply(lambda doc: [word.lemma_ for word in doc if not word.is_stop])
+    series=series.apply(lambda doc: [word.lemma_ for word in doc])
     series=series.apply(lambda doc: " ".join(doc))
     return series
 
@@ -63,7 +64,10 @@ def make_vectorizer(hw_csv_file):
 # used to convert raw utterances to tensors for input to model (can be (B, embed_dim) or (B, S, embed_dim)!!)
 def utterances_to_tensors(utterance_series, vectorizer, embeddings=True):
     if embeddings:
-        pass
+        from scripts.datatools import nlp
+        utterance_series = utterance_series.apply(lambda sentence: nlp(sentence).vector)
+        sentence_tensor = torch.FloatTensor(np.array(utterance_series.tolist()))
+        return sentence_tensor
     return torch.FloatTensor(vectorizer.transform(utterance_series.values).toarray())
 
 
