@@ -37,9 +37,7 @@ class RelationClassifierPro(nn.Module):
     def __init__(self, input_dim, dropout=0.3):
         super().__init__()
         self.layers = nn.Sequential(Block(input_dim, 256, dropout=dropout),
-                                    Block(256, 256, dropout=dropout),
                                     Block(256, 64, dropout=dropout),
-                                    Block(64, 64, dropout=dropout),
                                     Block(64, 64, dropout=dropout),
                                     nn.Linear(64, 18)
                                     )
