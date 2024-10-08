@@ -36,12 +36,12 @@ def balanced_loss_fn(preds, targets, damping_factor, classwise_weights=None):
     num_targets = targets.sum(dim=0)
     discard_classes=num_targets!=0
     positive_score = len(targets)/(num_targets+1e-6)
-    if classwise_weights:
-        positive_score*classwise_weights
-    loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=positive_score).mean(dim=0)
+    # if classwise_weights is not None:
+    #     positive_score*classwise_weights
+    loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=None).mean(dim=0)
     loss=loss_classwise[discard_classes].mean()
-    zeros_loss = loss_classwise[~discard_classes].mean()*damping_factor
-    return loss+zeros_loss
+    # zeros_loss = loss_classwise[~discard_classes].mean()*damping_factor
+    return loss
     
 
 # function to train the pytorch model        
@@ -98,7 +98,7 @@ def train_func(
             
             train_acc.update(preds.detach(), targets)
             train_loss.append(loss.detach().cpu())
-            scheduler.step()
+            # scheduler.step()
         
         
         # evaluate on val set

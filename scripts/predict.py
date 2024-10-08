@@ -1,6 +1,6 @@
 import pandas as pd
 import torch
-from .datatools import utterances_to_tensors
+from .datatools import utterances_to_tensors, clean_utterance_text
 
 torch.manual_seed(0)
 # converts raw model predictions to a series of text names
