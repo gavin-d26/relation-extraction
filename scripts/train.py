@@ -98,7 +98,7 @@ def train_func(
             
             train_acc.update(preds.detach(), targets)
             train_loss.append(loss.detach().cpu())
-            # scheduler.step()
+            scheduler.step()
         
         
         # evaluate on val set
