@@ -9,7 +9,7 @@ import spacy
 torch.manual_seed(0)
 
 spacy.cli.download("en_core_web_md")
-nlp=spacy.load("en_core_web_sm")
+nlp=spacy.load("en_core_web_md")
 
 # func to clean text sentences
 def clean_utterance_text(series):
