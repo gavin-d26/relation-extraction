@@ -25,8 +25,8 @@ class Block(nn.Module):
         super().__init__()
         self.layers=nn.Sequential(nn.Linear(in_features=in_features, 
                                             out_features=out_features,
-                                            bias=True),
-                                #   nn.BatchNorm1d(out_features),
+                                            bias=False),
+                                  nn.BatchNorm1d(out_features),
                                   nn.ReLU(),
                                   nn.Dropout(dropout))
         
@@ -36,7 +36,8 @@ class Block(nn.Module):
 class RelationClassifierPro(nn.Module):
     def __init__(self, input_dim, dropout=0.3):
         super().__init__()
-        self.layers = nn.Sequential(Block(input_dim, 256, dropout=dropout),
+        self.layers = nn.Sequential(nn.BatchNorm1d(input_dim),
+                                    Block(input_dim, 256, dropout=dropout),
                                     Block(256, 64, dropout=dropout),
                                     Block(64, 64, dropout=dropout),
                                     nn.Linear(64, 19)
