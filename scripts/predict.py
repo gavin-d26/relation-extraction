@@ -23,6 +23,7 @@ def make_submission_file(model, vectorizer, hw_test_csv_path, ids_to_names, save
     device=torch.device(device)
     model.to(device)
     df = pd.read_csv(hw_test_csv_path, index_col="ID")
+    df['UTTERANCES']=clean_utterance_text(df['UTTERANCES'])
     
     inputs = utterances_to_tensors(df['UTTERANCES'], vectorizer)
     
@@ -39,9 +40,6 @@ def make_submission_file(model, vectorizer, hw_test_csv_path, ids_to_names, save
 def make_validation_file(model, vectorizer, val_df, ids_to_names, save_validation_file_path="validation.csv", threshold=0., device='cpu'):
     device=torch.device(device)
     model.to(device)
-    
-    # clean sentences
-    val_df['UTTERANCES']=clean_utterance_text(val_df['UTTERANCES'])
     
     # convert sentences to tensors
     inputs = utterances_to_tensors(val_df['UTTERANCES'], vectorizer)
