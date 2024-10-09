@@ -1,4 +1,6 @@
 import argparse
+import random
+import numpy as np
 import torch
 import scripts.configs as configs
 import scripts.datatools as datatools
@@ -7,6 +9,9 @@ import scripts.train as train
 import scripts.predict as predict
 
 torch.manual_seed(0)
+np.random.seed(0)
+random.seed(0)
+torch.use_deterministic_algorithms(True)
 
 def main():
     parser = argparse.ArgumentParser()

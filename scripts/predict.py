@@ -1,8 +1,12 @@
+import random
+import numpy as np
 import pandas as pd
 import torch
 from .datatools import utterances_to_tensors, clean_utterance_text
 
 torch.manual_seed(0)
+np.random.seed(0)
+random.seed(0)
 # converts raw model predictions to a series of text names
 def preds_array_to_series(preds, ids_to_names):
     preds= preds.tolist()

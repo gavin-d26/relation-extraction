@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import pandas as pd
 import torch
@@ -7,6 +8,8 @@ from sklearn.model_selection import train_test_split
 import spacy
 
 torch.manual_seed(0)
+np.random.seed(0)
+random.seed(0)
 
 spacy.cli.download("en_core_web_md")
 nlp=spacy.load("en_core_web_md")
@@ -92,12 +95,18 @@ class RelationExtractionDataset(torch.utils.data.Dataset):
         return len(self.inputs)
 
 
+def worker_init_fn(worker_id):
+    seed=0
+    np.random.seed(seed+worker_id)
+    random.seed(seed+worker_id)
+
+
 # creates dataloaders for train and val datasets
 def create_dataloaders(train_df, val_df, vectorizer, batch_size=32, ):
     train_dataset = RelationExtractionDataset(train_df, vectorizer)
     val_dataset = RelationExtractionDataset(val_df, vectorizer)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=True)
-    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=True, worker_init_fn=worker_init_fn)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True, worker_init_fn=worker_init_fn)
     return train_loader, val_loader
 
 

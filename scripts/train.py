@@ -1,10 +1,14 @@
 import os
+import random
+import numpy as np
 from tqdm import tqdm
 import torch
 import torch.nn.functional as F
 from .datatools import RelationExtractionDataset, create_dataloaders
 
 torch.manual_seed(0)
+np.random.seed(0)
+random.seed(0)
 # class to compute global/classwise multi-label accuracy
 class MultilabelAccuracy():
     def __init__(self, classwise=False, threshold=0.):
@@ -39,7 +43,7 @@ def balanced_loss_fn(preds, targets, damping_factor):
     loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=None).mean(dim=0)
     loss=loss_classwise[discard_classes].mean()
     return loss
-    
+
 
 # function to train the pytorch model        
 def train_func(
