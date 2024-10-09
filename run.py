@@ -42,7 +42,6 @@ def main():
         device=configs.device,
         damping_factor=configs.damping_factor,
         weight_decay=configs.weight_decay,
-        classwise_weights=configs.classwise_weights
     )
     
     predict.make_submission_file(model,
