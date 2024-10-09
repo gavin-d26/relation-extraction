@@ -5,6 +5,6 @@ device= 'cpu' #'cpu'
 epochs=300
 optimizer='adam'
 lr_patience=80
-dropout=0.2
+dropout=0.25
 damping_factor=0.0
 weight_decay=0.0
