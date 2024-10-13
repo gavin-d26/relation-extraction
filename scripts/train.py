@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 import torch
 import torch.nn.functional as F
+from torch.utils.tensorboard import SummaryWriter
 from .datatools import RelationExtractionDataset, create_dataloaders
 
 torch.manual_seed(0)
@@ -73,6 +74,9 @@ def train_func(
     val_acc_classwise = MultilabelAccuracy(classwise=True)
     
     max_val_acc=0
+    max_epoch=0
+    
+    tbwriter=SummaryWriter("./runs", filename_suffix=run_name)
     
     print(f"Starting Training: {run_name}")
     
@@ -119,14 +123,23 @@ def train_func(
             "val_acc_classwise":val_acc_classwise.compute(),
         }
         
+        tbwriter.add_scalar('Loss/train', metrics['train_loss'], epoch)
+        tbwriter.add_scalar('Loss/val', metrics['val_loss'], epoch)
+        tbwriter.add_scalar('Accuracy/train', metrics['train_acc'], epoch)
+        tbwriter.add_scalar('Accuracy/val', metrics['val_acc'], epoch)
+        
         if metrics["val_acc"]>max_val_acc:
             if not os.path.isdir("./checkpoints"):
                 os.mkdir("./checkpoints")
             torch.save(model.state_dict(), "./checkpoints/model.pt")
             max_val_acc=metrics["val_acc"]
+            max_epoch=epoch
         
         print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.2f} \
                 val_acc": {metrics["val_acc"]:.2f}')
+    
+    print(f"best model at epoch: {max_epoch}")
+    
         
     model.to(device=torch.device('cpu'))
     model.load_state_dict(torch.load("./checkpoints/model.pt", map_location="cpu"))

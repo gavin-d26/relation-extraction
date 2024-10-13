@@ -1,8 +1,8 @@
-run_name="baseline-0_1"
+run_name="final-0_2"
 lr = 1e-3
 batch_size=128
 device= 'cpu' #'cpu'
-epochs=300
+epochs=600
 optimizer='adam'
 lr_patience=80
 dropout=0.3
