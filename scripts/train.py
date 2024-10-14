@@ -150,6 +150,7 @@ def train_func(
     model.to(device=torch.device('cpu'))
     model.load_state_dict(torch.load("./checkpoints/model.pt", map_location="cpu"))
         
+import matplotlib.pyplot as plt
 
 def plot_accuracy(training_accuracy, validation_accuracy, save_path='accuracy_plot.png'):
     """
