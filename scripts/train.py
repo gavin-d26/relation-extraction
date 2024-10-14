@@ -68,6 +68,9 @@ def train_func(
     train_acc_list=[]
     val_acc_list=[]
     
+    max_val_acc=0
+    max_epoch=0
+    
     for epoch in tqdm(range(epochs)):
         print(f"-------- Epoch {epoch} --------")
         
@@ -110,6 +113,13 @@ def train_func(
             "val_acc_classwise":val_acc_classwise.compute(),
         }
         
+        if metrics["val_acc"]>max_val_acc:
+            if not os.path.isdir("./checkpoints"):
+                os.mkdir("./checkpoints")
+            torch.save(model.state_dict(), "./checkpoints/model.pt")
+            max_val_acc=metrics["val_acc"]
+            max_epoch=epoch
+        
         print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.5f} \
                 val_acc": {metrics["val_acc"]:.5f}')
         
@@ -117,6 +127,11 @@ def train_func(
         train_acc_list.append(metrics['train_acc'])
         val_acc_list.append(metrics['val_acc'])
     
+    print(f"best model at epoch: {max_epoch}")
+    
+        
+    model.to(device=torch.device('cpu'))
+    model.load_state_dict(torch.load("./checkpoints/model.pt", map_location="cpu"))
     
     plot_accuracy(train_acc_list, val_acc_list, save_path='accuracy_plot.png')    
         

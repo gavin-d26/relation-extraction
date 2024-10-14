@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 import spacy
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
 torch.manual_seed(0)
@@ -35,7 +35,7 @@ def preprocess_raw_training_file(hw_csv_file):
 # fit a count vectorizer on text corpus
 def make_vectorizer(hw_csv_file):
     df = pd.read_csv(hw_csv_file)
-    vectorizer = CountVectorizer(stop_words='english', max_features=1500)
+    vectorizer = TfidfVectorizer(stop_words='english', max_features=1500)
     vectorizer.fit(df['UTTERANCES'].values)
     return vectorizer
 
