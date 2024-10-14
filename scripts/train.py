@@ -110,8 +110,8 @@ def train_func(
             "val_acc_classwise":val_acc_classwise.compute(),
         }
         
-        print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.2f} \
-                val_acc": {metrics["val_acc"]:.2f}')
+        print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.5f} \
+                val_acc": {metrics["val_acc"]:.5f}')
         
         
         train_acc_list.append(metrics['train_acc'])
