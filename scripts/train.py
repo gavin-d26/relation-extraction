@@ -35,7 +35,7 @@ def balanced_loss_fn(preds, targets):
     num_targets = targets.sum(dim=0)
     discard_classes=num_targets!=0
     positive_score = len(targets)/(num_targets+1e-7)
-    loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=positive_score).mean(dim=0)
+    loss_classwise=F.binary_cross_entropy_with_logits(preds, targets, reduction='none', pos_weight=None).mean(dim=0)
     loss=loss_classwise[discard_classes].mean()
     return loss
     
@@ -64,6 +64,9 @@ def train_func(
     val_acc_classwise = MultilabelAccuracy(classwise=True)
     
     print(f"Starting Training: {run_name}")
+    
+    train_acc_list=[]
+    val_acc_list=[]
     
     for epoch in tqdm(range(epochs)):
         print(f"-------- Epoch {epoch} --------")
@@ -111,10 +114,45 @@ def train_func(
                 val_acc": {metrics["val_acc"]:.2f}')
         
         
+        train_acc_list.append(metrics['train_acc'])
+        val_acc_list.append(metrics['val_acc'])
+    
+    
+    plot_accuracy(train_acc_list, val_acc_list, save_path='accuracy_plot.png')    
         
-        
-        
-        
+import matplotlib.pyplot as plt
+
+def plot_accuracy(training_accuracy, validation_accuracy, save_path='accuracy_plot.png'):
+    """
+    Plots the training and validation accuracy per epoch and saves it as a PNG file.
+
+    Parameters:
+    - training_accuracy (list of float): List of training accuracies per epoch.
+    - validation_accuracy (list of float): List of validation accuracies per epoch.
+    - save_path (str): File path to save the plot. Default is 'accuracy_plot.png'.
+    """
+    if len(training_accuracy) != len(validation_accuracy):
+        raise ValueError("Training and validation accuracy lists must have the same length.")
+
+    epochs = range(0, len(training_accuracy))  # Epochs start from 1
+
+    plt.figure(figsize=(8, 6))
+
+    # Plotting both accuracies with distinct colors and markers
+    plt.plot(epochs, training_accuracy, label='Training Accuracy', marker='o', color='blue')
+    plt.plot(epochs, validation_accuracy, label='Validation Accuracy', marker='s', color='green')
+    
+    # Adding labels, title, and legend
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.title('Baseline Model Training and Validation Accuracy per Epoch')
+    plt.legend(loc='lower right')  # Legend placed at the bottom-right corner
+    plt.grid(True)  # Enable grid for better visualization
+
+    # Save the plot as a PNG file
+    plt.savefig(save_path, format='png')
+    plt.close()  # Close the plot to free up memory
+    print(f"Plot saved as {save_path}")
         
         
         
