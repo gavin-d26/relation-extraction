@@ -76,6 +76,9 @@ def train_func(
     max_val_acc=0
     max_epoch=0
     
+    train_acc_list=[]
+    val_acc_list=[]
+    
     tbwriter=SummaryWriter("./runs", filename_suffix=run_name)
     
     print(f"Starting Training: {run_name}")
@@ -135,16 +138,50 @@ def train_func(
             max_val_acc=metrics["val_acc"]
             max_epoch=epoch
         
+        train_acc_list.append(metrics['train_acc'])
+        val_acc_list.append(metrics['val_acc'])
+        
         print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.2f} \
                 val_acc": {metrics["val_acc"]:.2f}')
     
     print(f"best model at epoch: {max_epoch}")
     
-        
+    plot_accuracy(train_acc_list, val_acc_list, save_path='accuracy_plot.png')    
     model.to(device=torch.device('cpu'))
     model.load_state_dict(torch.load("./checkpoints/model.pt", map_location="cpu"))
         
-        
+
+def plot_accuracy(training_accuracy, validation_accuracy, save_path='accuracy_plot.png'):
+    """
+    Plots the training and validation accuracy per epoch and saves it as a PNG file.
+
+    Parameters:
+    - training_accuracy (list of float): List of training accuracies per epoch.
+    - validation_accuracy (list of float): List of validation accuracies per epoch.
+    - save_path (str): File path to save the plot. Default is 'accuracy_plot.png'.
+    """
+    if len(training_accuracy) != len(validation_accuracy):
+        raise ValueError("Training and validation accuracy lists must have the same length.")
+
+    epochs = range(0, len(training_accuracy))  # Epochs start from 1
+
+    plt.figure(figsize=(8, 6))
+
+    # Plotting both accuracies with distinct colors and markers
+    plt.plot(epochs, training_accuracy, label='Training Accuracy', marker='o', color='blue')
+    plt.plot(epochs, validation_accuracy, label='Validation Accuracy', marker='s', color='green')
+    
+    # Adding labels, title, and legend
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.title('Training and Validation Accuracy per Epoch')
+    plt.legend(loc='lower right')  # Legend placed at the bottom-right corner
+    plt.grid(True)  # Enable grid for better visualization
+
+    # Save the plot as a PNG file
+    plt.savefig(save_path, format='png')
+    plt.close()  # Close the plot to free up memory
+    print(f"Plot saved as {save_path}")
         
         
         
