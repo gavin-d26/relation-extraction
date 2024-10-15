@@ -5,14 +5,23 @@ import torch
 import spacy
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
-import spacy
+from spacy.cli import download
+from spacy.util import is_package
 
 torch.manual_seed(0)
 np.random.seed(0)
 random.seed(0)
 
-spacy.cli.download("en_core_web_md")
-nlp=spacy.load("en_core_web_md")
+def load_spacy_model(model_name="en_core_web_md"):
+    # Check if the model is already installed
+    if not is_package(model_name):
+        print(f"Model '{model_name}' not found. Downloading...")
+        download(model_name)
+
+    # Load the model
+    return spacy.load(model_name)
+
+nlp=load_spacy_model(model_name="en_core_web_md")
 
 # func to clean text sentences
 def clean_utterance_text(series):
