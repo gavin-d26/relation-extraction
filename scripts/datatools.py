@@ -67,7 +67,6 @@ def make_vectorizer(hw_csv_file):
 # used to convert raw utterances to tensors for input to model (can be (B, embed_dim) or (B, S, embed_dim)!!)
 def utterances_to_tensors(utterance_series, vectorizer, embeddings=True):
     if embeddings:
-        from scripts.datatools import nlp
         utterance_series = utterance_series.apply(lambda sentence: nlp(sentence).vector)
         sentence_tensor = torch.FloatTensor(np.array(utterance_series.tolist()))
         return sentence_tensor
