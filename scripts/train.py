@@ -37,7 +37,7 @@ class MultilabelAccuracy():
         return result
 
 
-def balanced_loss_fn(preds, targets, damping_factor):
+def balanced_loss_fn(preds, targets):
     num_targets = targets.sum(dim=0)
     discard_classes=num_targets!=0
     positive_score = len(targets)/(num_targets+1e-6)
@@ -55,9 +55,7 @@ def train_func(
     run_name="base-0_1",
     lr=3e-4,
     optimizer='adam',
-    device='cpu',
-    damping_factor=2,
-    weight_decay=1e-5,
+    device='cpu'
                ):
     device = torch.device(device)
     model.to(device=device)
@@ -65,7 +63,7 @@ def train_func(
     loss_fn = torch.nn.BCEWithLogitsLoss()
     
     if optimizer=='adam':
-        optimizer=torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+        optimizer=torch.optim.Adam(model.parameters(), lr=lr)
         
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs*len(train_loader))
     
@@ -92,7 +90,7 @@ def train_func(
             inputs, targets = inputs.to(device), targets.to(device)
             
             preds = model(inputs)
-            loss = balanced_loss_fn(preds, targets, damping_factor)
+            loss = balanced_loss_fn(preds, targets)
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()

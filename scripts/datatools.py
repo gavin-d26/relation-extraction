@@ -101,7 +101,7 @@ def worker_init_fn(worker_id):
     random.seed(seed+worker_id)
 
 
-# creates dataloaders for train and val datasets
+# creates dataloaders for train and val datasets, Note: it no longer uses vectorizer
 def create_dataloaders(train_df, val_df, vectorizer, batch_size=32, ):
     train_dataset = RelationExtractionDataset(train_df, vectorizer)
     val_dataset = RelationExtractionDataset(val_df, vectorizer)

@@ -44,9 +44,7 @@ def main():
         run_name=configs.run_name,
         lr=configs.lr,
         optimizer=configs.optimizer,
-        device=configs.device,
-        damping_factor=configs.damping_factor,
-        weight_decay=configs.weight_decay,
+        device=configs.device
     )
     
     predict.make_submission_file(model,
@@ -54,14 +52,6 @@ def main():
                                  test_csv_path, 
                                  ID_TO_NAME, 
                                  save_submission_file_path=submission_csv_path, 
-                                 threshold=0., 
-                                 device=configs.device)
-    
-    
-    predict.make_validation_file(model,
-                                 vectorizer,
-                                 val_df, 
-                                 ID_TO_NAME, 
                                  threshold=0., 
                                  device=configs.device)
     

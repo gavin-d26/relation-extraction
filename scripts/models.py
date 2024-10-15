@@ -8,6 +8,7 @@ np.random.seed(0)
 random.seed(0)
 
 
+# Baseline model in Report
 class RelationClassifier(nn.Module):
     def __init__(self, input_dim):
         super().__init__()
@@ -26,6 +27,7 @@ class RelationClassifier(nn.Module):
         return x  # (batch_size, 20)
     
 
+# block module that packages linear, bn, relu and dropout layers
 class Block(nn.Module):
     def __init__(self, in_features, out_features, dropout):
         super().__init__()
@@ -39,6 +41,8 @@ class Block(nn.Module):
     def forward(self, inputs):
         return self.layers(inputs)
 
+
+# Final model in Report
 class RelationClassifierPro(nn.Module):
     def __init__(self, input_dim, dropout=0.3):
         super().__init__()
