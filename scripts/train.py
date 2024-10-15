@@ -141,8 +141,8 @@ def train_func(
         train_acc_list.append(metrics['train_acc'])
         val_acc_list.append(metrics['val_acc'])
         
-        print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.2f} \
-                val_acc": {metrics["val_acc"]:.2f}')
+        print(f'train_loss: {metrics["train_loss"]:.2f}   val_loss: {metrics["val_loss"]:.2f}   train_acc: {metrics["train_acc"]:.5f} \
+                val_acc": {metrics["val_acc"]:.5f}')
     
     print(f"best model at epoch: {max_epoch}")
     
